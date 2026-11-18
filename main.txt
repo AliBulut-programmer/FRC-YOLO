@@ -1,0 +1,90 @@
+import cv2
+#local import
+from src.config import MODEL_PATH, CONF_THRESH, IMG_SIZE, VIDEO_PATH,TRACK_THRESH, IOU, FIELD_SIZE, START_FRAME_COUNT, HOMOGRAPHY_CSV_PATH, FOURCC, BBOX_THRESH_CALC_FRAME
+from src.detection.detector import RobotDetection
+from scripts.annotation.annotation import annotate
+from src.preprocessing.letterbox import LetterBoxer
+from src.preprocessing.avg_bbox import calc_bbox
+from src.tracking.tracker import RobotTracker
+from src.postprocessing.homography_mapping import FieldTransformer
+from src.postprocessing.position_annotation import Radar
+from src.postprocessing.post_filter import MasterProcessor
+
+def main():
+    #detector init
+    detector = RobotDetection(
+        MODEL_PATH,
+        CONF_THRESH,
+        IMG_SIZE,
+        IOU
+    )
+
+    tracker = RobotTracker(track_thresh=0.2) #tracker init
+    letterboxer = LetterBoxer() #letterboxer init
+    transformer = FieldTransformer(FIELD_SIZE ,HOMOGRAPHY_CSV_PATH)
+    radar = Radar(FIELD_SIZE)
+    master_processor = MasterProcessor(velocity_thresh=250, realtime= True,fps= 60, init_frame_count= START_FRAME_COUNT)
+    
+    cap = cv2.VideoCapture(VIDEO_PATH) 
+    frame_count = START_FRAME_COUNT #initialize frame count    
+    cap.set(cv2.CAP_PROP_POS_FRAMES, START_FRAME_COUNT)
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    out = None
+
+    while cap.isOpened():
+
+        ok,frame = cap.read()
+        if not ok:
+            print("capture read issue")
+            break
+
+        frame = frame[:716]
+
+        #letterbox
+        letterboxed= letterboxer.letterbox(frame, IMG_SIZE)
+        detections = detector.predict(letterboxed)
+        
+        init_frame_count = START_FRAME_COUNT
+        avg_bbox = avg_bbox if "avg_bbox" in locals() else []
+        use_avg_bbox = use_avg_bbox if "use_avg_bbox" in locals() else False
+        if not use_avg_bbox:
+            avg_bbox , use_avg_bbox= calc_bbox(frame_count=frame_count,detections= detections, init_frame_count=init_frame_count,BBOX_THRESH_CALC_FRAME= BBOX_THRESH_CALC_FRAME,avg_bbox=avg_bbox)
+        kwargs= {"frame": frame, "detections": detections }
+        
+        detections = tracker.track(**kwargs, avg_bbox=avg_bbox) if use_avg_bbox else tracker.track(**kwargs)
+
+        print("running process frame")
+
+        detections, velocity_matrix, center_positions,past_center_positions = master_processor.process_frame(frame_count= frame_count, frame = frame, detections = detections, avg_bbox= avg_bbox)
+        
+        annotated_frame = annotate(letterboxed, frame_count, detections,velocity_matrix, center_positions ,past_center_positions) if "velocity_matrix" in locals()  else  annotate(letterboxed, frame_count, detections, None,center_positions ,past_center_positions)
+        letterboxer.scale_detections(detections)
+        
+        positions = transformer.transform_batch(detections)
+        radar.map_positions(positions, detections)
+        #TESTING
+        
+        output_img = letterboxer.remove_letterbox(annotated_frame)
+
+        if out is None:
+            # output_img.shape returns (height, width, channels)
+            out_height, out_width = output_img.shape[:2]
+            out = cv2.VideoWriter("outputs/output.mp4", FOURCC, fps, (out_width, out_height))
+        
+        #   out.write(output_img)
+        #if frame_count== START_FRAME_COUNT + 500:
+        #    break
+        cv2.imshow("annotated frame", output_img)
+        cv2.waitKey(0)
+        
+
+
+        frame_count += 1
+        print("#######################################################################################")
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()

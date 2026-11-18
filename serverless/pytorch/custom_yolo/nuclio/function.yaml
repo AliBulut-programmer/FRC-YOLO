@@ -1,0 +1,35 @@
+metadata:
+  name: yolo11m-frc
+  namespace: cvat
+  annotations:
+    name: FRC Robot Detector
+    kind: ai
+    type: detector
+    spec: |
+      [
+        {"id": 0, "name": "robot"}
+      ]
+
+spec:
+  description: "Custom YOLOv11m model trained for FRC scouting at 1024 imgsz"
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 30s
+
+  build:
+    image: cvat.pth.yolo11m_frc
+    baseImage: ultralytics/ultralytics:latest
+    commands:
+      - pip install --no-cache-dir opencv-python-headless
+
+  triggers:
+    myHttpTrigger:
+      maxWorkers: 1
+      kind: http
+      workerAvailabilityTimeout: 10000
+      attributes:
+        port: 8080
+
+  resources:
+    limits:
+      nvidia.com/gpu: "1"

@@ -1,0 +1,48 @@
+{
+    "folder-color.pathColors": [
+        {
+            "folderPath": "FRC-YOLO\\src\\deprecated\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_262626"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\analysis\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_005fd7"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\frontend\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_5fafaf"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\homography\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_af5f00"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\ingestion_pipeline\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_5f875f"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\track_detect\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_d70000"
+        },
+        {
+            "folderPath": "FRC-YOLO\\src\\utils\\",
+            "isFolderOnly": true,
+            "color": "foldercolorizer.color_875fd7"
+        },
+        {
+            "extension": "py",
+            "color": "foldercolorizer.color_afd7d7"
+        },
+        {
+            "filePath": "FRC-YOLO\\main.py",
+            "color": "foldercolorizer.color_afd7d7",
+            "badge": "MN"
+        }
+    ]
+}

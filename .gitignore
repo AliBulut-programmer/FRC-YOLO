@@ -1,0 +1,17 @@
+venv/
+datasets/
+raw_videos/
+outputs/
+runs/
+weights/
+cvat_xml_annotations/
+unannotated_vids/
+*.zip
+*.exe
+*.pt
+*.pt
+*.onnx
+__pycache__/
+*.pyc
+venv/
+outputs/

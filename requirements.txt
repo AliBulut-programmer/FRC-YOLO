@@ -1,0 +1,11 @@
+ultralytics
+roboflow
+yt-dlp
+numpy
+supervision
+opencv-python<5.0.0
+trackers
+pandas
+torch
+#extra
+moviepy

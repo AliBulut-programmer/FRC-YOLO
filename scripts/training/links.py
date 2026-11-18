@@ -1,0 +1,4 @@
+#links = ["https://www.youtube.com/watch?v=j8wz5vw5XfE", "https://www.youtube.com/watch?v=e6BkyVPaI7E","https://www.youtube.com/watch?v=HUQTgtxXv_8",  "https://www.youtube.com/watch?v=usMiJkjY6vQ", "https://www.youtube.com/watch?v=nSzBX1nPtWE", "https://www.youtube.com/watch?v=o44SVmkWKj4&t=27s","https://www.youtube.com/watch?v=ZN1shh2QF9k","https://www.youtube.com/watch?v=uyMkQoXoZnY", "https://www.youtube.com/watch?v=Tn1bhyGdGYI","https://www.youtube.com/watch?v=5CARflnbl3s","https://www.youtube.com/watch?v=BHX19yZAjhs"]
+links= ["https://www.youtube.com/playlist?list=PLejuMcenwJl0"]
+
+print(links)

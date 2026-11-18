@@ -1,0 +1,115 @@
+def one_to_one_matching(self, detections):
+        unassigned = detections[(detections.tracker_id == -1) | (detections.tracker_id > 5)]
+        canon = np.array(range(0,6)) 
+        keep_ids = ~np.isin(canon, detections.tracker_id)
+        unused_canon = []
+        unused_canon = canon[keep_ids]
+        
+        #print(f"unused canon : {unused_canon}")
+        #print(f"unassigned : {unassigned}")
+        #check unassigned and unused canon len
+        if len(unused_canon)==1 and len(unassigned)== 1:
+            #print(detections.xyxy)
+            #print(f"unassigned xyxy {unassigned.xyxy}")
+            mask = np.all(detections.xyxy == unassigned.xyxy, axis = 1)
+            detections.tracker_id[mask] = unused_canon[0]
+            #print(unassigned)
+            #print(detections[detections == unassigned].tracker_id)
+        #print(detections.tracker_id)
+        return detections, unassigned, unused_canon
+
+    def hungarian_dist_matching(self, detections, unassigned, unused_canon):
+        if len(self.processed_detections) >0 and len(unused_canon)>0:
+            highest_key= max(k for k,v in self.processed_detections.items() if len(v) == 6)
+            prev_detect = self.processed_detections.get(highest_key)
+            
+            print(f"unassigned xyxy {unassigned.xyxy}")
+            past_pos = []
+            for x in prev_detect.xyxy[np.isin(prev_detect.tracker_id, unused_canon)]:
+                past_pos.append(x[:2])
+            print(f"past detection {past_pos}")
+            #rows have current detections
+            rows_list = []
+            for uid in unassigned.xyxy:
+                print(f"uid {uid}")
+                rows_list.append(uid[:2])
+            if len(rows_list)>0 and len(past_pos) >0:
+                print(f"rows list {rows_list}")
+                rows = np.vstack(rows_list).astype(np.float32)
+                columns = np.vstack(past_pos)
+                print(f"rows {rows}, columns {columns}")
+                cost_matrix = distance.cdist(rows, columns, "euclidean")
+                print(f"cost mtrrix {cost_matrix}")
+                row_idx, col_idx = linear_sum_assignment(cost_matrix)
+                print(f"row idx{row_idx}, cold idx {col_idx}")
+                
+                print(f"1 columns  {columns}")
+                return rows, columns, row_idx, col_idx, past_pos, prev_detect
+
+        return None,None, None, None, None,None
+        
+    def process_detections(self,rows,columns, row_idx, col_idx, detections,past_pos,prev_detect ,unused_canon):
+        if (rows is None or columns is None or row_idx is None or 
+    col_idx is None or detections is None):
+            return
+        for r_idx, c_idx in zip(row_idx, col_idx):
+            
+            print(f"rows {rows}, row[idx] {rows[r_idx]}")
+            print(f"2columns  {columns}, col[idx] {columns[c_idx]}")
+            
+            #Idk if I need this part--
+            matched_rows = []
+            for i, x in enumerate(detections.xyxy):
+                print(x[:2])
+                if np.array_equal( x[:2], rows[r_idx]):
+                    matched_rows.append(i)
+            #--
+            
+            
+            print(f"detections.xyxy {detections.xyxy[matched_rows]}")
+            print(unused_canon)
+            indices =  np.where((detections.xyxy == detections.xyxy[matched_rows]).all(axis=1))[0] #index numbers of current 
+            print(f"indices: {indices}")
+            
+            #Idk if I need this part--
+            matched_columns = []
+            for i, x in enumerate(prev_detect.xyxy):
+                print(x[:2])
+                if np.array_equal( x[:2], columns[c_idx]):
+                    matched_columns.append(i)
+            #--
+            print(f"prev detect {prev_detect}")
+            print(matched_columns)
+            
+            target_idx = prev_detect.tracker_id[matched_columns]
+            print(f"target {target_idx}")
+            
+            for x, idx in zip(target_idx,indices):
+                if detections.tracker_id[idx] is None:
+                    return
+                else:
+                    print("before")
+                    print(detections)
+                    detections.tracker_id[idx] = x
+                    print("after")
+                    print(detections)
+            
+        
+    def avg_bbox_filter(self, avg_bbox, detections):
+        print(avg_bbox)
+        detections_list = []
+        for i, xyxy in enumerate(detections.xyxy):
+            x1, y1,x2,y2 = xyxy[0],xyxy[1],xyxy[2],xyxy[3]
+            w = x2-x1 
+            h = y2-y1
+            if w> avg_bbox[0] and h > avg_bbox[1]:
+                detections_list.append(detections[i])
+            else:
+                
+                #print(f"bbox filtered {w,h,}") 
+                pass
+
+        detections = sv.Detections.merge(detections_list)
+
+        return detections
+        
