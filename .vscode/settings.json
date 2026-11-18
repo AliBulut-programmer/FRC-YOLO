@@ -44,5 +44,6 @@
             "color": "foldercolorizer.color_afd7d7",
             "badge": "MN"
         }
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
