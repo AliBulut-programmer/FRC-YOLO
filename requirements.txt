@@ -7,5 +7,6 @@ opencv-python<5.0.0
 trackers
 pandas
 torch
+easyocr
 #extra
 moviepy

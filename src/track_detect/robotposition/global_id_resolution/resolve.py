@@ -94,17 +94,21 @@ def stitch(npz_path, n_robots=6):
     """_summary_
 
     Args:
-        npz_path (_type_): _description_
-        n_robots (int, optional): _description_. Defaults to 6.
+        npz_path (_type_): where the results will be saved
+        n_robots (int, optional): actual number of robots in the scene. Defaults to 6.
     """
     # ------------------------- pull info from .npz file ------------------------- #
     data = np.load(npz_path)
-    frames = data["frame"]
+    frames = data["frame"]  # frame idx from .npz file
     tracker_ids = data["tracker_id"]  # tracker_id data from .npz file
     embs = data["emb"].astype(np.float32)  # emb data from .npz file
+
+    # get unique detections (excluding-1) and how many times they appear
     track_ids, track_counts = np.unique(
         tracker_ids[tracker_ids >= 0], return_counts=True
     )
+
+    # turn unique detections and counts to dict
     tracklet_support = dict(zip(track_ids.tolist(), track_counts.tolist()))
 
     # -------------------- embedding calculation and matching -------------------- #

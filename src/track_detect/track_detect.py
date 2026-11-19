@@ -54,9 +54,10 @@ def run(video_path=VIDEO_PATH, output_path="outputs/detections/data.npz"):
         detections = detector.predict(letterboxed)
         # --------------------------------- tracking --------------------------------- #
         detections = tracker.track(frame=letterboxed, detections=detections)
-
+        # ----------------------------- scale detections ----------------------------- #
         letterboxer.scale_detections(detections)
 
+        # -------------------------- add detections to npz -------------------------- #
         for i in range(len(detections)):
             recorder.add(
                 frame_idx=frame_count,
@@ -75,4 +76,4 @@ def run(video_path=VIDEO_PATH, output_path="outputs/detections/data.npz"):
         frame_count += 1
 
     cap.release()
-    recorder.save(output_path)
+    recorder.save(output_path)  # save detections

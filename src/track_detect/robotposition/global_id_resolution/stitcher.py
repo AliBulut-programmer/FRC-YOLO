@@ -31,17 +31,15 @@ class TrackletStitcher:
         #! values are the mean embedding vectors
         galleries = {}
         for tid in np.unique(tracker_ids):
-            if tid < 0:
+            if tid < 0:  # -1 ids dont have embeddings assigned
                 continue
             # create boolean mask, filters for current tid in the .npz file order
             mask = tracker_ids == tid
             # get embeddings of current tid
             tid_embs = embeddings[mask]
-            valid = np.isfinite(tid_embs).all(axis=1)
-            if valid.any():
-                galleries[int(tid)] = tid_embs[valid].mean(
-                    axis=0
-                )
+            valid = np.isfinite(tid_embs).all(axis=1)  # check emb validity
+            if valid.any():  # check if there are any embeddings at all
+                galleries[int(tid)] = tid_embs[valid].mean(axis=0)  # create galleries
         return galleries
 
     def stitch(
@@ -99,7 +97,12 @@ class TrackletStitcher:
                             ]
                         )
                     )
-                    candidate = (distance, min(first_cluster), first_index, second_index)
+                    candidate = (
+                        distance,
+                        min(first_cluster),
+                        first_index,
+                        second_index,
+                    )
                     if distance <= max_dist and (
                         best_merge is None or candidate < best_merge
                     ):
