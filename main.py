@@ -6,8 +6,8 @@ from scripts.debugging.save_video import run
 def main():
     npz_path = "outputs/detections/data.npz"
     run_track_detect(output_path=npz_path)
-    # embed(npz_path=npz_path)
-    # stitch(npz_path=npz_path)
+    embed(npz_path=npz_path)
+    stitch(npz_path=npz_path)
     run()
 
 

@@ -43,7 +43,7 @@ class TrackletStitcher:
         return galleries
 
     def stitch(
-        self, galleries, cooccurring_pairs=(), tracklet_support=None, max_dist=0.2
+        self, galleries, cooccurring_pairs=(), tracklet_support=None, max_dist=0.6
     ):
         """Merge similar non-overlapping tracklets, leaving excess tracks unmapped."""
         tids = sorted(galleries)
@@ -71,6 +71,7 @@ class TrackletStitcher:
             for first, second in cooccurring_pairs
             if first != second
         }
+        print(f"cannot link {cannot_link}")
         support = tracklet_support or {}
         clusters = [{tid} for tid in tids]
         positions = {tid: index for index, tid in enumerate(tids)}
@@ -125,6 +126,7 @@ class TrackletStitcher:
             clusters = clusters[: self.n_robots]
 
         clusters.sort(key=min)
+
         return {
             tid: cluster_id
             for cluster_id, cluster in enumerate(clusters)

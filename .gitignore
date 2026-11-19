@@ -6,6 +6,7 @@ runs/
 weights/
 cvat_xml_annotations/
 unannotated_vids/
+training/
 *.zip
 *.exe
 *.pt

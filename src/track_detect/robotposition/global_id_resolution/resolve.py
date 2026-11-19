@@ -60,7 +60,10 @@ def embed(npz_path, video_path=VIDEO_PATH):
         while current_cap_frame < frame_idx:
             # if frames are skipped in the .npz file for any reason, burn through the frames without detections
             cap.read()
+            print("frame_skip")
             current_cap_frame += 1
+
+        # ********************************* DEBUGGING ******************************** #
 
         ok, frame = cap.read()
         current_cap_frame += 1
@@ -79,6 +82,11 @@ def embed(npz_path, video_path=VIDEO_PATH):
             if x2 <= x1 or y2 <= y1:  # if detections are faulty
                 continue
             crop = frame[y1:y2, x1:x2]  # crop only the detection
+            if current_cap_frame % 100 == 0:
+                cv2.imwrite(
+                    f"outputs/test_embed_crops/crop{current_cap_frame}.jpg", crop
+                )
+
             embs[i] = vit.extract(crop).astype(np.float32)  # assign emb value
 
     cap.release()
@@ -125,6 +133,11 @@ def stitch(npz_path, n_robots=6):
         [mapping.get(int(tid), -1) for tid in tracker_ids],
         dtype=np.int16,
     )  # get the canonical ids of tid detections and make a matrix (-1 if not in mapping)
+
+    # ********************************* DEBUGGING ******************************** #
+    print("support:", sorted(tracklet_support.items(), key=lambda x: -x[1]))
+    print("mapping:", mapping)
+    print("unmapped:", [t for t in tracklet_support if t not in mapping])
 
     np.savez_compressed(
         npz_path,
