@@ -1,7 +1,7 @@
 import cv2
 
 MODEL_PATH = "runs/detect/frc_scouting/custom_annotated_augmented_v1/weights/best.pt"
-CONF_THRESH = 0.4
+CONF_THRESH = 0.45
 TRACK_THRESH = 0.1
 LOST_TRACK_BUFFER = 10
 MIN_CONSECUTIVE_FRAME = 2
@@ -12,7 +12,7 @@ MIN_IOU_TRACKER = 0.2
 IMG_SIZE = 1024
 DEVICE = 0
 LETTERBOX_COLOR = (144, 144, 144)
-VIDEO_PATH = "C:/Users/alibu/Desktop/FRC-YOLO/unannotated_vids/Qualification 2 - Canadian Pacific Regional_EUEcMex0o74.mp4"
+VIDEO_PATH = "C:/Users/alibu/Desktop/FRC-YOLO/unannotated_vids/Einstein Final 2 - FIRST Championship - FIRST Robotics Competition_nSzBX1nPtWE.mp4"
 FIELD_SIZE = (1657, 800)  # width height 1cm->1pixel
 HOMOGRAPHY_CSV_PATH = "src/homography/initiation/homography.csv"
 BBOX_THRESH_CALC_FRAME = 2
@@ -27,4 +27,4 @@ FONT = cv2.FONT_HERSHEY_SIMPLEX
 FONT_SCALE = 0.5
 THICKNESS = 1
 START_FRAME_COUNT = 300
-END_FRAME_COUNT = 1200
+END_FRAME_COUNT = 15000
